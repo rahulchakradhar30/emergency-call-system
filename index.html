@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Emergency Quick Call System — fast, one-tap access to Indian emergency helplines" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>🚨 Emergency Quick Call</title>
+
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:         #0d0d1a;
+      --surface:    #1a1a2e;
+      --border:     #2e2e4d;
+      --text:       #f0f0f5;
+      --subtext:    #a0a0b8;
+
+      /* Priority colours */
+      --red-bg:     #3b0a0a;
+      --red-border: #c0392b;
+      --red-icon:   #ff4d4d;
+      --red-num:    #ff6b6b;
+
+      --orange-bg:     #3b1a00;
+      --orange-border: #d35400;
+      --orange-icon:   #ff8c42;
+      --orange-num:    #ffaa70;
+
+      --green-bg:     #002910;
+      --green-border: #1e8449;
+      --green-icon:   #2ecc71;
+      --green-num:    #58d68d;
+
+      --radius: 14px;
+      --shadow: 0 4px 18px rgba(0,0,0,.5);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100dvh;
+      padding: 0 0 env(safe-area-inset-bottom) 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===== Header ===== */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+
+    header p {
+      font-size: .75rem;
+      color: var(--subtext);
+      margin-top: 3px;
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* ===== Section ===== */
+    section {
+      margin-bottom: 28px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-left: 2px;
+    }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .label-red    { color: var(--red-icon); }
+    .label-orange { color: var(--orange-icon); }
+    .label-green  { color: var(--green-icon); }
+
+    /* ===== Grid ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    @media (min-width: 480px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* ===== Card button ===== */
+    .card {
+      background: var(--red-bg);
+      border: 1.5px solid var(--red-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 18px 10px 14px;
+      text-align: center;
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      user-select: none;
+      /* Minimum touch target 48×48 px */
+      min-height: 110px;
+      position: relative;
+      overflow: hidden;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .card:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 2px;
+    }
+
+    .card:active {
+      transform: scale(.95);
+      filter: brightness(1.2);
+    }
+
+    /* Card variants */
+    .card.orange {
+      background: var(--orange-bg);
+      border-color: var(--orange-border);
+    }
+    .card.green {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+    }
+
+    /* Ripple */
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,255,255,.18) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity .3s ease;
+      pointer-events: none;
+    }
+    .card:active::after { opacity: 1; }
+
+    /* Icon */
+    .card .icon {
+      font-size: 2.1rem;
+      line-height: 1;
+    }
+
+    /* Name */
+    .card .name {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    /* Number badge */
+    .card .num {
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--red-num);
+      background: rgba(192, 57, 43, .2);
+      border-radius: 20px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .card.orange .num {
+      color: var(--orange-num);
+      background: rgba(211, 84, 0, .2);
+    }
+    .card.green .num {
+      color: var(--green-num);
+      background: rgba(30, 132, 73, .2);
+    }
+
+    /* ===== Confirmation Modal ===== */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    #overlay.active { display: flex; }
+
+    #modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px 22px 0 0;
+      width: 100%;
+      max-width: 500px;
+      padding: 28px 24px 32px;
+      animation: slideUp .22s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    #modal-icon {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    #modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    #modal-number {
+      font-size: 2rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    #modal-desc {
+      font-size: .82rem;
+      color: var(--subtext);
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-cancel, .btn-call {
+      flex: 1;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px;
+      transition: filter .15s ease, transform .1s ease;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .btn-cancel {
+      background: var(--border);
+      color: var(--subtext);
+    }
+    .btn-cancel:active { filter: brightness(.8); transform: scale(.97); }
+
+    .btn-call {
+      background: #c0392b;
+      color: #fff;
+      letter-spacing: .5px;
+    }
+    .btn-call:active { filter: brightness(1.2); transform: scale(.97); }
+    .btn-call.orange-call { background: #d35400; }
+    .btn-call.green-call  { background: #1e8449; }
+
+    .btn-cancel:focus-visible,
+    .btn-call:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 2px;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      font-size: .7rem;
+      color: var(--subtext);
+      padding: 12px 16px 24px;
+    }
+
+    /* ===== Accessibility: reduce motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header role="banner">
+    <h1>🚨 Emergency Quick Call</h1>
+    <p>India Helplines · Tap to call · Confirm before dialing</p>
+  </header>
+
+  <main role="main" aria-label="Emergency helplines">
+
+    <!-- ===== RED: Critical ===== -->
+    <section aria-labelledby="lbl-critical">
+      <div class="section-label label-red" id="lbl-critical">🔴 Critical</div>
+      <div class="grid">
+        <button class="card" onclick="openModal(this)"
+          data-number="112" data-name="All Emergencies"
+          data-icon="🆘" data-desc="Universal emergency number" data-priority="red"
+          aria-label="Call 112 — All Emergencies">
+          <span class="icon">🆘</span>
+          <span class="name">All Emergencies</span>
+          <span class="num">112</span>
+        </button>
+        <button class="card" onclick="openModal(this)"
+          data-number="100" data-name="Police"
+          data-icon="👮" data-desc="National Police helpline" data-priority="red"
+          aria-label="Call 100 — Police">
+          <span class="icon">👮</span>
+          <span class="name">Police</span>
+          <span class="num">100</span>
+        </button>
+        <button class="card" onclick="openModal(this)"
+          data-number="108" data-name="Ambulance"
+          data-icon="🚑" data-desc="Medical emergency & ambulance" data-priority="red"
+          aria-label="Call 108 — Ambulance">
+          <span class="icon">🚑</span>
+          <span class="name">Ambulance</span>
+          <span class="num">108</span>
+        </button>
+        <button class="card" onclick="openModal(this)"
+          data-number="101" data-name="Fire Brigade"
+          data-icon="🚒" data-desc="Fire emergency service" data-priority="red"
+          aria-label="Call 101 — Fire Brigade">
+          <span class="icon">🚒</span>
+          <span class="name">Fire Brigade</span>
+          <span class="num">101</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== ORANGE: Secondary ===== -->
+    <section aria-labelledby="lbl-secondary">
+      <div class="section-label label-orange" id="lbl-secondary">🟠 Secondary</div>
+      <div class="grid">
+        <button class="card orange" onclick="openModal(this)"
+          data-number="1091" data-name="Women Helpline"
+          data-icon="👩" data-desc="Women safety & distress helpline" data-priority="orange"
+          aria-label="Call 1091 — Women Helpline">
+          <span class="icon">👩</span>
+          <span class="name">Women Helpline</span>
+          <span class="num">1091</span>
+        </button>
+        <button class="card orange" onclick="openModal(this)"
+          data-number="1098" data-name="Child Helpline"
+          data-icon="🧒" data-desc="Children in need of care" data-priority="orange"
+          aria-label="Call 1098 — Child Helpline">
+          <span class="icon">🧒</span>
+          <span class="name">Child Helpline</span>
+          <span class="num">1098</span>
+        </button>
+        <button class="card orange" onclick="openModal(this)"
+          data-number="1930" data-name="Cyber Crime"
+          data-icon="🔒" data-desc="Cyber fraud & crime reporting" data-priority="orange"
+          aria-label="Call 1930 — Cyber Crime">
+          <span class="icon">🔒</span>
+          <span class="name">Cyber Crime</span>
+          <span class="num">1930</span>
+        </button>
+        <button class="card orange" onclick="openModal(this)"
+          data-number="139" data-name="Railway Help"
+          data-icon="🚆" data-desc="Railway emergency & enquiry" data-priority="orange"
+          aria-label="Call 139 — Railway Help">
+          <span class="icon">🚆</span>
+          <span class="name">Railway Help</span>
+          <span class="num">139</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== GREEN: Special ===== -->
+    <section aria-labelledby="lbl-special">
+      <div class="section-label label-green" id="lbl-special">🟢 Special</div>
+      <div class="grid">
+        <button class="card green" onclick="openModal(this)"
+          data-number="1078" data-name="Disaster Mgmt"
+          data-icon="🌊" data-desc="Flood, earthquake & disaster relief" data-priority="green"
+          aria-label="Call 1078 — Disaster Management">
+          <span class="icon">🌊</span>
+          <span class="name">Disaster Mgmt</span>
+          <span class="num">1078</span>
+        </button>
+        <button class="card green" onclick="openModal(this)"
+          data-number="1800180161" data-name="Industrial Safety"
+          data-icon="🏭" data-desc="Factory / industrial emergency" data-priority="green"
+          aria-label="Call 1800-180-0161 — Industrial Safety Helpline">
+          <span class="icon">🏭</span>
+          <span class="name">Industrial Safety</span>
+          <span class="num">1800-180-161</span>
+        </button>
+        <button class="card green" onclick="openModal(this)"
+          data-number="9152987821" data-name="Mental Health"
+          data-icon="🧠" data-desc="iCall — mental health support" data-priority="green"
+          aria-label="Call 9152987821 — Mental Health">
+          <span class="icon">🧠</span>
+          <span class="name">Mental Health</span>
+          <span class="num">9152987821</span>
+        </button>
+        <button class="card green" onclick="openModal(this)"
+          data-number="14567" data-name="Senior Citizen"
+          data-icon="👴" data-desc="Elderly care & support helpline" data-priority="green"
+          aria-label="Call 14567 — Senior Citizen Helpline">
+          <span class="icon">👴</span>
+          <span class="name">Senior Citizen</span>
+          <span class="num">14567</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer role="contentinfo">
+    <p>For real emergencies only · Calls routed to official Indian helplines</p>
+  </footer>
+
+  <!-- ===== Confirmation Overlay ===== -->
+  <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <div id="modal">
+      <div id="modal-icon" aria-hidden="true"></div>
+      <div id="modal-title"></div>
+      <div id="modal-number" aria-live="polite"></div>
+      <div id="modal-desc"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btn-cancel" onclick="closeModal()" aria-label="Cancel call">Cancel</button>
+        <button class="btn-call"   id="btn-call"   onclick="confirmCall()" aria-label="Confirm and call">📞 Call Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    let pendingNumber = '';
+    let pendingPriority = '';
+
+    // --- Modal helpers ---
+
+    function openModal(btn) {
+      pendingNumber   = btn.dataset.number;
+      pendingPriority = btn.dataset.priority;
+
+      document.getElementById('modal-icon').textContent   = btn.dataset.icon;
+      document.getElementById('modal-title').textContent  = btn.dataset.name;
+      document.getElementById('modal-desc').textContent   = btn.dataset.desc;
+
+      // Format the display number nicely
+      const numEl = document.getElementById('modal-number');
+      numEl.textContent = formatDisplay(pendingNumber);
+
+      // Colour the call button by priority
+      const callBtn = document.getElementById('btn-call');
+      callBtn.className = 'btn-call';
+      if (pendingPriority === 'orange') callBtn.classList.add('orange-call');
+      if (pendingPriority === 'green')  callBtn.classList.add('green-call');
+
+      // Show overlay
+      const overlay = document.getElementById('overlay');
+      overlay.classList.add('active');
+
+      // Trap focus — move focus to Cancel so first Tab goes to Call
+      document.getElementById('btn-cancel').focus();
+
+      // Vibrate on open (pattern: short buzz)
+      vibrate([40]);
+    }
+
+    function closeModal() {
+      document.getElementById('overlay').classList.remove('active');
+      pendingNumber   = '';
+      pendingPriority = '';
+    }
+
+    function confirmCall() {
+      if (!pendingNumber) return;
+
+      // Vibration feedback on confirm
+      vibrate([60, 40, 60]);
+
+      closeModal();
+
+      // Small delay so the modal can close before the OS call UI appears
+      setTimeout(function () {
+        const tel = 'tel:' + pendingNumber;
+        try {
+          window.location.href = tel;
+        } catch (err) {
+          alert(
+            'Unable to initiate call — your browser or device may not support calling directly.\n\n' +
+            'Please dial ' + formatDisplay(pendingNumber) + ' manually.'
+          );
+        }
+      }, 120);
+    }
+
+    // --- Utilities ---
+
+    function vibrate(pattern) {
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate(pattern);
+        }
+      } catch (_) {
+        // Silently ignore if vibration is unsupported or blocked
+      }
+    }
+
+    function formatDisplay(num) {
+      // Format long numbers with regular hyphens; CSS white-space:nowrap prevents wrapping
+      if (num.length > 7) {
+        if (num.startsWith('1800')) {
+          // 1800-XXX-XXXX
+          return num.slice(0,4) + '-' + num.slice(4,7) + '-' + num.slice(7);
+        }
+        if (num.length === 10) {
+          // 91529-87821
+          return num.slice(0,5) + '-' + num.slice(5);
+        }
+      }
+      return num;
+    }
+
+    // --- Close modal on overlay click (outside the card) ---
+    document.getElementById('overlay').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+
+    // --- Close modal on Escape key ---
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // --- Focus trap inside modal ---
+    document.getElementById('modal').addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      const focusable = [document.getElementById('btn-cancel'), document.getElementById('btn-call')];
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  </script>
+
+</body>
+</html>

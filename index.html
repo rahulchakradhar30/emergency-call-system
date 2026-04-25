@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency Quick Call System</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #0f172a;
+    color: white;
+}
+
+header {
+    background: #dc2626;
+    text-align: center;
+    padding: 15px;
+}
+
+main {
+    padding: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.25s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* Priority Colors */
+.red {
+    background: #dc2626;
+}
+
+.orange {
+    background: #ea580c;
+}
+
+.green {
+    background: #16a34a;
+}
+
+.blue {
+    background: #2563eb;
+}
+
+.card:active {
+    transform: scale(0.95);
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #020617;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🚨 Emergency Quick Call System</h1>
+    <p>Tap an issue → Confirm → Instant Call</p>
+</header>
+
+<main>
+
+<div class="grid">
+
+<!-- 🔴 PRIMARY EMERGENCY -->
+<div class="card red" onclick="call('112','National Emergency')">🚨 National Emergency (112)</div>
+
+<div class="card red" onclick="call('108','Ambulance')">❤️ Ambulance (108)</div>
+
+<div class="card red" onclick="call('100','Police')">⚠️ Police (100)</div>
+
+<div class="card red" onclick="call('101','Fire Force')">🔥 Fire (101)</div>
+
+<!-- 🟠 SECONDARY SUPPORT -->
+<div class="card orange" onclick="call('1091','Women Safety')">👩 Women Safety (1091)</div>
+
+<div class="card orange" onclick="call('1098','Child Helpline')">👶 Child Helpline (1098)</div>
+
+<div class="card orange" onclick="call('1930','Cyber Crime')">💻 Cyber Crime (1930)</div>
+
+<div class="card orange" onclick="call('182','Railway Helpline')">🚆 Railway (182)</div>
+
+<!-- 🟢 SPECIAL CASES -->
+<div class="card green" onclick="call('1070','Disaster Management')">🌍 Disaster (1070)</div>
+
+<div class="card green" onclick="call('112','Industrial Accident')">🏭 Industrial Accident</div>
+
+<div class="card green" onclick="call('112','Mental Health Crisis')">🧠 Mental Crisis</div>
+
+<!-- 🔵 UTILITIES -->
+<div class="card blue" onclick="call('112','Utility Emergency')">⚡ Utility Failure</div>
+
+</div>
+
+</main>
+
+<footer>
+    <p>Emergency System | Project by Chakradhar</p>
+</footer>
+
+<script>
+function call(number, label) {
+
+    // 📳 Vibration feedback (mobile devices)
+    if (navigator.vibrate) {
+        navigator.vibrate(200);
+    }
+
+    // ⚠️ Confirmation dialog
+    let confirmCall = confirm("Do you want to call " + label + " (" + number + ")?");
+
+    if (confirmCall) {
+
+        // 📞 Attempt call
+        window.location.href = "tel:" + number;
+
+        // ⏳ Fallback alert (if call doesn't trigger)
+        setTimeout(() => {
+            alert("If the call did not start, please dial manually: " + number);
+        }, 1500);
+    }
+}
+</script>
+
+</body>
+</html>
